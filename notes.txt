@@ -1,0 +1,8 @@
+animatorClass:
+    need interpolators, set global
+    keyf: vars, time, next
+    keyf?: interp,
+    ?cut: vars, time
+    compare keys of vars & newvars
+    if both have, lerp
+hypercubes:

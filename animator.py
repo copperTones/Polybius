@@ -1,22 +1,42 @@
 import math as m
 
 class Interp:
+    '''\
+Class for interpolation functions and lerp-related functions.
+Useful with interpolating between keyframes.'''
     def step(t):
+        '''All values over .5 become 1, below returns 0'''
         return 0 if t<.5 else 1
     def lin(t):
+        '''Linear function.'''
         return t
     def smooth(t):
+        '''Most basic smoothstep, order 3.'''
         return t*t*(3 - 2*t)
     def smooth5(t):
+        '''Order 5 smoothstep.'''
         return t*t*t*(10 + (-15 + 6*t)*t)
     def sine(t):
+        '''Sinusoidal interpolation.'''
         return .5-m.cos(t*m.pi)/2
     
-    def clamp(x):
-        return 0 if x<0 else 1 if x>1 else x
+    def newSmooth(deg):
+        '''Returns a 2n+1 order smoothstep function.'''
+        def smooth(t):
+            x = 0
+            for k in range(deg+1):
+                x += combo(deg+k, k)*combo(2*deg+1, deg-k)*(-t)**k
+            return x*t**(deg+1)
+        smooth.__doc__ = '''A {} order smoothstep function.'''.format(2*deg+1)
+        return smooth
+    
+    # def clamp(x):
+        # return 0 if x<0 else 1 if x>1 else x
     def lerp(x, y, t):
+        '''Lerp between two values.'''
         return (y-x)*t + x
     def unlerp(x, y, t):
+        '''Map value in a given range to 0...1.'''
         return (t-x)/(y-x)
 class Keyframe:
     def __init__(self, time, interp=Interp.lin, **vars):

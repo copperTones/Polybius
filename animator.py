@@ -38,12 +38,13 @@ Useful with interpolating between keyframes.'''
     def unlerp(x, y, t):
         '''Map value in a given range to 0...1.'''
         return (t-x)/(y-x)
+
 class Keyframe:
     def __init__(self, time, interp=Interp.lin, **vars):
         self.time = time
         self.interp = interp
         self.vars = vars
-    def addNext(self, other):
+    def __addNext(self, other):
         self.next = other
     
     def setVars(self, time):
@@ -56,7 +57,17 @@ class Keyframe:
                 vars[k] = Interp.lerp(self.vars[k], self.next.vars[k], t)
         globals().update(vars) 
 class Animation:
-    pass
+    def __init__(self, loop=0, *keyf):
+        keyf = sorted(keyf, lambda f: f.time)
+        for i in range(len(keyf)-1):
+            keyf[i].__addNext(keyf[i+1])
+        loop = max(0, loop)
+        if loop:
+            keyf[len(keyf)-1].__addNext(keyf[0])
+        
+        self.keyf = keyf
+        self.loop = loop
+    
 
 if __name__ == '__main__':
     while 1:
